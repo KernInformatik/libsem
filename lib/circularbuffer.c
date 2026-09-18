@@ -1,80 +1,48 @@
+/**
+ * @file circularbuffer.c
+ * @author your name (you@domain.com)
+ * @brief  circular buffer implementation
+ * @details prerequisites. The caller of this library should have initialized the corresponding semaphores and has
+ * already initialized a shared memory object. Since a circular buffer is nothing more than ana array with positional
+ * read/write heads, limited via the modulo operator
+ * @version 0.1
+ * @date 2026-09-18
+ *
+ * @copyright Copyright (c) 2026
+ *
+ */
 #include "circularbuffer.h"
 #include "semaphore.h"
 
-struct circBuff *initializeCircularBuffer(bool isServer)
-{
-    struct circBuff *rv = (struct circBuff *)malloc(sizeof(struct circBuff));
-    if (isServer)
-    {
-        rv->sharedMemory->alive = true;
-        rv->sharedMemory = sharedMemory_Server(&rv->shmfd);
-        rv->free = initializeSemaphore_Server(FREE_SPACE_SEMAPHORE, FREE_SPACE_SEMAPHORE_SIZE);
-        rv->write = initializeSemaphore_Server(WRITE_SPACE_SEMAPHORE, WRITE_SPACE_SEMAPHORE_SIZE);
-        rv->used = initializeSemaphore_Server(USED_SPACE_SEMAPHORE, USED_SPACE_SEMAPHORE_SIZE);
-    }
-    else
-    {
-        rv->sharedMemory = sharedMemory_Client(&rv->shmfd);
-        rv->free = initializeSemaphore_Client(FREE_SPACE_SEMAPHORE);
-        rv->write = initializeSemaphore_Client(WRITE_SPACE_SEMAPHORE);
-        rv->used = initializeSemaphore_Client(USED_SPACE_SEMAPHORE);
-    }
+static struct shm *circularBuffer;
 
-    return rv;
+void initializeCircularBuffer(struct shm *shm, bool isServer)
+{
+    circularBuffer = shm;
+    circularBuffer->writehead = 0, circularBuffer->readhead = 0;
 }
 
-int closeCircularBuffer(struct circBuff *circBuff, bool isServer)
+int closeCircularBuffer(bool isServer)
 {
-    if (isServer)
-    {
-        circBuff->sharedMemory->alive = false;
-        cleanSharedMemory_Server(circBuff->sharedMemory, circBuff->shmfd);
-        cleanSemaphore_Server(circBuff->free, FREE_SPACE_SEMAPHORE);
-        cleanSemaphore_Server(circBuff->used, USED_SPACE_SEMAPHORE);
-        cleanSemaphore_Server(circBuff->write, WRITE_SPACE_SEMAPHORE);
-    }
-    else
-    {
-        cleanSharedMemory_Client(circBuff->sharedMemory, circBuff->shmfd);
-        cleanSemaphore_Client(circBuff->free);
-        cleanSemaphore_Client(circBuff->used);
-        cleanSemaphore_Client(circBuff->write);
-    }
-    free(circBuff);
+    free(circularBuffer);
+    printf("Please close the SHM object cleanSharedMemory_*\n");
+    return 0;
 }
 
-void writeCircularBuffer(struct circBuff *circBuff, int value)
+void writeCircularBuffer(int value)
 {
-    if (sem_wait(circBuff->write) == -1)
-    {
-        return;
-    }
-
-    if (sem_wait(circBuff->free) == -1)
-    {
-        sem_post(circBuff->write);
-        return;
-    }
-
-    struct shm *shm = circBuff->sharedMemory;
-    shm->data[shm->writehead] = value;
-    circBuff->sharedMemory->writehead++;
-    circBuff->sharedMemory->writehead %= MAX_BUFF_SIZE;
-
-    sem_post(circBuff->used);
-    sem_post(circBuff->write);
-    return;
+    sem_wait(circularBuffer->free);
+    circularBuffer->data[circularBuffer->writehead] = value;
+    sem_post(circularBuffer->used);
+    circularBuffer->writehead++;
+    circularBuffer->writehead %= MAX_BUFF_SIZE;
 }
 
-int readCircularBuffer(struct circBuff *circBuff)
+int readCircularBuffer()
 {
-    if (sem_wait(circBuff->used) == -1)
-        return -1;
-
-    struct shm *shm = circBuff->sharedMemory;
-    int rv = (int)shm->data[shm->readhead];
-    shm->readhead = (shm->readhead + 1) % MAX_BUFF_SIZE;
-
-    sem_post(circBuff->free);
+    sem_wait(circularBuffer->used);
+    int rv = circularBuffer->data[circularBuffer->readhead];
+    sem_post(circularBuffer->free);
+    circularBuffer->readhead = (circularBuffer->readhead++) % MAX_BUFF_SIZE;
     return rv;
 }
