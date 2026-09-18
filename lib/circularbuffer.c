@@ -14,6 +14,7 @@
  */
 #include "circularbuffer.h"
 #include "semaphore.h"
+#include <semaphore.h>
 
 static struct shm *circularBuffer;
 
@@ -35,7 +36,9 @@ void
 writeCircularBuffer(int value)
 {
 	sem_wait(circularBuffer->free);
+	sem_wait(circularBuffer->write);
 	circularBuffer->data[circularBuffer->writehead] = value;
+	sem_post(circularBuffer->write);
 	sem_post(circularBuffer->used);
 	circularBuffer->writehead++;
 	circularBuffer->writehead %= MAX_BUFF_SIZE;
