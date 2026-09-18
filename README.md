@@ -16,13 +16,23 @@ A small C library for POSIX shared memory + semaphore based IPC between one serv
 
 ## Building
 
-There's no Makefile yet. Compile the sources directly, e.g.:
+There's a Makefile that builds a static library, `build/libsem.a`.
 
 ```sh
-gcc -c lib/semaphore.c -o semaphore.o
-gcc -c lib/circularbuffer.c -o circularbuffer.o
-gcc your_app.c semaphore.o circularbuffer.o -o your_app -lpthread -lrt
+make            # default flags: -std=c99 -pedantic -g -Wall
+make verbose    # adds -Wextra -Wwrite-strings -Wconversion -Wformat=2 -Warray-bounds -Wstack-protector -Wshadow
+make asan       # default flags + AddressSanitizer/UBSan
+make harden     # default flags + compile-time hardening (stack protector, fortify source, etc.)
+make clean
 ```
+
+Then link your program against it:
+
+```sh
+gcc your_app.c build/libsem.a -o your_app -lpthread -pthread -lrt
+```
+
+If you used `make harden`, also add the link-time hardening flags it prints at the end of the build (`-pie -Wl,-z,relro,-z,now -Wl,-z,noexecstack`), since those only matter at the final link step, not when building the static library itself.
 
 ## Usage
 
