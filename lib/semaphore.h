@@ -61,19 +61,6 @@ needed for proper IPC communication between processess
 /*END SEMAPHORE OPTIONS */
 
 /*SEMAPHORE ERROR*/
-#define SEM_EACCESS_ERROR "The semaphore exists, but the caller does not have permission to open it."
-#define SEM_EEXISTS_ERROR                                                                                              \
-    "Both O_CREAT and O_EXCL were specified in oflag, but a semaphore with this name already exists. "
-#define SEM_EINVAL_ERROR                                                                                               \
-    "value was greater than SEM_VALUE_MAX OR name consists of just followed by no other characters. "
-#define SEM_EMFILE_ERROR "The process already has the maximum number of files and open."
-#define SEM_ENAMETOOLONG_ERROR "name was too long"
-#define SEM_ENFILE_ERROR "The system limit on the total number of open files has been reached."
-#define SEM_ENOENT_ERROR						\
-    "The O_CREAT flag was not specified in oflag and no semaphore with this name exists; or, O_CREAT was specified, "\
-    "but name wasn't well formed."
-#define SEM_ENOMEM_ERROR "Insufficient memory."
-
 #define OPENING_SHM_ERROR_SERVER "Creating shared memory failed"
 #define OPENING_SHM_ERROR_CLIENT "Opening shared memory failed. Ensure a supervisor is running"
 
