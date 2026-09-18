@@ -21,14 +21,13 @@ process
 
 #include "common.h"
 #define MAX_BUFF_SIZE 2048
-struct shm
-{
-    size_t data[MAX_BUFF_SIZE];
-    size_t readhead;
-    size_t writehead;
-    int *shmfd;
-    sem_t *free, *write, *used;
-    bool alive;
+struct shm {
+	size_t data[MAX_BUFF_SIZE];
+	size_t readhead;
+	size_t writehead;
+	int *shmfd;
+	sem_t *free, *write, *used;
+	bool alive;
 };
 
 /*SHARED MEMORY OPTIONS */
@@ -70,8 +69,8 @@ needed for proper IPC communication between processess
 #define SEM_EMFILE_ERROR "The process already has the maximum number of files and open."
 #define SEM_ENAMETOOLONG_ERROR "name was too long"
 #define SEM_ENFILE_ERROR "The system limit on the total number of open files has been reached."
-#define SEM_ENOENT_ERROR                                                                                               \
-    "The O_CREAT flag was not specified in oflag and no semaphore with this name exists; or, O_CREAT was specified, "  \
+#define SEM_ENOENT_ERROR						\
+    "The O_CREAT flag was not specified in oflag and no semaphore with this name exists; or, O_CREAT was specified, "\
     "but name wasn't well formed."
 #define SEM_ENOMEM_ERROR "Insufficient memory."
 
@@ -150,7 +149,8 @@ void cleanSharedMemory_Client(struct shm *shm, int shmfd);
  * @param init_value The initial value of the semaphore.
  * @return sem_t*
  */
-sem_t *initializeSemaphore_Server(const char *sem_name, unsigned int init_value);
+sem_t *initializeSemaphore_Server(const char *sem_name,
+    unsigned int init_value);
 
 /**
  * @brief Opens an existing named semaphore (client side)

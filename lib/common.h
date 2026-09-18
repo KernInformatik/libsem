@@ -42,12 +42,12 @@
 #include <regex.h>
 #include <time.h>
 
-#define error(msg)                                                                                                     \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        perror(msg);                                                                                                   \
-        printf("Error (%d): %s\n", errno, strerror(errno));                                                            \
-        exit(EXIT_FAILURE);                                                                                            \
+#define error(msg)							\
+    do									\
+    {									\
+        perror(msg);							\
+        printf("Error (%d): %s\n", errno, strerror(errno));		\
+        exit(EXIT_FAILURE);						\
     } while (true)
 
 /*Put datastructures here if needed, else create for datastructure a header */

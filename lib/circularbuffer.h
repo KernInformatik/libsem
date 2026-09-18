@@ -26,7 +26,7 @@ void initializeCircularBuffer(struct shm *shm);
  * @param isServer
  * @return int
  */
-int closeCircularBuffer( bool isServer);
+int closeCircularBuffer(bool isServer);
 
 /**
  * @brief writes data into the circular buffer
