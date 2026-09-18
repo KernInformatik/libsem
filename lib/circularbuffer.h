@@ -17,7 +17,7 @@
  * @param isServer initializes the circular buffer corresponding to a server or a client
  * @return struct circBuff*
  */
-struct circBuff *initializeCircularBuffer(bool isServer);
+void initializeCircularBuffer(struct shm *shm);
 
 /**
  * @brief closes the circular buffer
@@ -26,7 +26,7 @@ struct circBuff *initializeCircularBuffer(bool isServer);
  * @param isServer
  * @return int
  */
-int closeCircularBuffer(struct circBuff *circBuff, bool isServer);
+int closeCircularBuffer( bool isServer);
 
 /**
  * @brief writes data into the circular buffer
@@ -34,7 +34,7 @@ int closeCircularBuffer(struct circBuff *circBuff, bool isServer);
  * @param circBuff
  * @param value
  */
-void writeCircularBuffer(struct circBuff *circBuff, int value);
+void writeCircularBuffer(int value);
 
 /**
  * @brief reads from the circular buffer
@@ -42,4 +42,4 @@ void writeCircularBuffer(struct circBuff *circBuff, int value);
  * @param circBuff
  * @return int
  */
-int readCircularBuffer(struct circBuff *circBuff);
+int readCircularBuffer();
